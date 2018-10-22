@@ -1,4 +1,5 @@
 import sys
+from os.path import join
 import numpy as np
 import matplotlib.pyplot as plt
 from Point import Point
@@ -6,6 +7,9 @@ import time
 from random import randint
 from scipy.spatial import distance
 
+
+output_path = 'pics'
+counter_pics = 0
 
 # Create data
 K = 3
@@ -29,12 +33,14 @@ for p in data:
     p.ax = ax.scatter(p.x, p.y, alpha=0.8, c=colors[p.group], edgecolors='none', s=30)
 fig.canvas.draw()
 
-centers = {0: (0,0)}
-old_centers = {}
-centers_points = {}
+# fig.savefig(join(output_path, f'{counter_pics}.jpg'))
+# counter_pics += 1
 
-while old_centers != centers:
-    old_centers = centers.copy()
+centers = {}
+centers_points = {}
+change = True
+while change:
+    change = False
     # Find centers
     for c in centers_points.values():
         c.remove()
@@ -53,10 +59,15 @@ while old_centers != centers:
             dis = distance.euclidean((p.x, p.y), centers[k])
             if dis < min_distance:
                 min_distance = dis
-                p.group = k
+                new_k = k
+        if p.group != new_k:
+            p.group = new_k
+            change = True
 
     # Re-draw the points with the new group's color 
     for count, p in enumerate(data):
         p.ax.set_color(colors[p.group])
-        if count % 5 == 0:
+        if count % 40 == 0:
             fig.canvas.draw()
+            # fig.savefig(join(output_path, f'{counter_pics}.jpg'))
+            # counter_pics += 1
